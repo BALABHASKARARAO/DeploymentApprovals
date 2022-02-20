@@ -23,7 +23,7 @@ jobs:
         uses: peter-murray/issue-body-parser-action@v1
         id: issue_body_parser
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.REPO_ACCESS_TOKEN }}
           issue_id: ${{ github.event.issue.number }}         
           payload_marker: target_payload 
   
@@ -50,7 +50,7 @@ jobs:
       - uses: JasonEtco/create-an-issue@v2
         name: Create approval Issue for Prod
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
           ENVIRONMENT: Prod
           RUNNUMBER: ${{ needs.parse.outputs.ci-run-number }}
         with:
@@ -85,7 +85,7 @@ jobs:
         if: ${{ needs.deploy-dev.result == 'success' || needs.deploy-prod.result == 'success' }}
         uses: peter-evans/close-issue@v1.0.3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
           comment: 'Deployment Completed 🌟'
     
     
