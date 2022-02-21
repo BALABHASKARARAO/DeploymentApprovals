@@ -5,8 +5,36 @@ Github Actions For ChatOps
 
 Basically in our Github repo settings we can' find environments. So if you want to  deploy your application on diffrent environments like Dev, Qa, test or Production. 
 
-In build.yml
-============
+deployment-approval.md
+======================
+this is issue templet  here i gave title and label we can give whatever the lablel here. The title is for Deployment Approval Required for perticular env that what ever we want to deploy and it will evaluvate by github actions. The action will evaluate these in
+the template so we will be able to pass variables basically to the issue creation through that github actions.
+here the issues saying deployment approve are required for dev for prod for qa and so on. you can use the payload and the sender and login so basically if i'm gonna run this action or to create this issue this will be deployment approval requested from my user which is 'Username' and then in my case what i want to do is if a user comment on this issue saying approved for example i want the deployment to take place now there are many other ways that you can achieve that i've seen people doing it like if you close the issue then get the deployment going
+if you you know add a label. for
+example, the issue you know with a specific label then the deployment is approved there are multiple ways and if a user comment approved to the issue then make it deploy and then have probably the most important part. Because this is related on how we will consume this data but
+you know think about what you're doing basically splitting the build and the deploy so you need basically a way to pass some metadata between the two workflows to be able to complete the job.
+`
+```
+title: Deployment Approval Required for {{ env.ENVIRONMENT }}
+labels: deployment-requested
+
+
+Deployment Approval requested from {{ payload.sender.login }}.
+
+Comment "Approved" to kick the deployment off.
+
+
+=== DON'T CHANGE BELOW THIS LINE
+```json target_payload
+{
+    "runNumber":  {{ env.RUNNUMBER }},
+    "environment": "{{ env.ENVIRONMENT }}"
+}
+```
+`
+
+build.yml
+===========
 whenever you do a build on your github actions you would do all the steps like testing building and so no. Later we do publish an artifact of the build.
 
 In this scenario normally we do another job here for the deployment using the environments. Since we not have envvironments is using somthing called issueops. 
@@ -25,48 +53,7 @@ when we have thea pproval we do right after the build and then approve the deplo
 ```          
 
 Here we can set the env and the issue run number with a file name.
-
-
-deployment-approval.md
-======================
-
-this is issue templet  here i gave title and label we can give whatever the lablel here. The title is for Deployment Approval Required for perticular env that what ever we want to deploy and it will evaluvate by github actions. The action will evaluate these in
-the template so we will be able to pass variables basically to the issue creation through that github actions.
-here the issues saying deployment approve are required for dev for prod for qa and so on. you can use the payload and the sender and login so basically if i'm gonna run this action or to create this issue this will be deployment approval requested from my user which is 'Username' and then in my case what i want to do is if a user comment on this issue saying approved for example i want the deployment to take place now there are many other ways that you can achieve that i've seen people doing it like if you close the issue then get the deployment going
-if you you know add a label. for
-example, the issue you know with a specific label then the deployment is approved there are multiple ways and if a user comment approved to the issue then make it deploy and then have probably the most important part. Because this is related on how we will consume this data but
-you know think about what you're doing basically splitting the build and the deploy so you need basically a way to pass some metadata between the two workflows to be able to complete the job.
----
-title: Deployment Approval Required for {{ env.ENVIRONMENT }}
-labels: deployment-requested
----
-
-Deployment Approval requested from {{ payload.sender.login }}.
-
-Comment "Approved" to kick the deployment off.
-
-
-=== DON'T CHANGE BELOW THIS LINE
-```json target_payload
-{
-    "runNumber":  {{ env.RUNNUMBER }},
-    "environment": "{{ env.ENVIRONMENT }}"
-}
-```
-
-
-
-build.yml
-===========
-```
- env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ENVIRONMENT: Dev
-          RUNNUMBER: ${{ github.run_number  }}
-        with:         
-          filename: .github/deployment-approval.md
-          
-```          
+   
 github token this is used by this action to be able to create the issue in my repo and then i have the environment variables `ENVIRONMENT: Dev` that i've used in my in my template remember i have the environment and i have the run number `RUNNUMBER: ${{ github.run_number  }}` and again i'll explain in a second why i use it i'm using those variables just uh bear with me with for a second on this so we said that we want to deploy to the next environment and the next environment in this case will be the dev environment so let's just put here the dev
 and then i want the run number and the run number i can consume it from a variable that is in the context of the github action so it's github.run number there's a difference between run number and run id you can use either ones i prefer round number because it's it's
 easier to understand and to to consume basically a round number is a is a progressive number that is that is assigned to a specific
