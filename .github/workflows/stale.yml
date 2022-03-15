@@ -25,7 +25,7 @@ jobs:
         stale-issue-message: 'This issue is stale because it has been open 15 day with no activity. Remove stale label or comment or this will be closed in 5 days'
         days-before-issue-stale: 15
         days-before-issue-close: 5
-        remove-stale-when-updated: remove-issue-stale
+        remove-stale-when-updated: true
         ignore-updates: true
 
         # pr
